@@ -1,0 +1,113 @@
+{
+    "status": "success",
+    "data": [
+        {
+            "no": 1.0,
+            "Brand": "LONGi",
+            "Series": NaN,
+            "Watt": 435,
+            "Width_m": 1.722,
+            "Length_m": 1.134,
+            "Thick(mm.)": 30,
+            "Price": 2100.0,
+            "Datasheet": NaN,
+            "URL": NaN
+        },
+        {
+            "no": 2.0,
+            "Brand": "LONGi",
+            "Series": NaN,
+            "Watt": 555,
+            "Width_m": 2.278,
+            "Length_m": 1.134,
+            "Thick(mm.)": 35,
+            "Price": 2855.0,
+            "Datasheet": NaN,
+            "URL": NaN
+        },
+        {
+            "no": 3.0,
+            "Brand": "JinKO",
+            "Series": "Tiger Neo N-type 72HL4-(V) 565-585",
+            "Watt": 565,
+            "Width_m": 2.278,
+            "Length_m": 1.134,
+            "Thick(mm.)": 35,
+            "Price": NaN,
+            "Datasheet": NaN,
+            "URL": NaN
+        },
+        {
+            "no": 4.0,
+            "Brand": "JinKO",
+            "Series": "Tiger Neo N-type 72HL4-(V) 565-586",
+            "Watt": 570,
+            "Width_m": 2.278,
+            "Length_m": 1.134,
+            "Thick(mm.)": 35,
+            "Price": NaN,
+            "Datasheet": NaN,
+            "URL": NaN
+        },
+        {
+            "no": 5.0,
+            "Brand": "JinKO",
+            "Series": "Tiger Neo N-type 72HL4-(V) 565-587",
+            "Watt": 575,
+            "Width_m": 2.278,
+            "Length_m": 1.134,
+            "Thick(mm.)": 35,
+            "Price": 4450.0,
+            "Datasheet": NaN,
+            "URL": NaN
+        },
+        {
+            "no": 6.0,
+            "Brand": "JinKO",
+            "Series": "Tiger Neo N-type 72HL4-(V) 565-588",
+            "Watt": 580,
+            "Width_m": 2.278,
+            "Length_m": 1.134,
+            "Thick(mm.)": 35,
+            "Price": NaN,
+            "Datasheet": NaN,
+            "URL": NaN
+        },
+        {
+            "no": 7.0,
+            "Brand": "JinKO",
+            "Series": "Tiger Neo N-type 72HL4-(V) 565-589",
+            "Watt": 585,
+            "Width_m": 2.278,
+            "Length_m": 1.134,
+            "Thick(mm.)": 35,
+            "Price": NaN,
+            "Datasheet": NaN,
+            "URL": NaN
+        },
+        {
+            "no": 8.0,
+            "Brand": NaN,
+            "Series": "Tiger Neo N-type 72HL4-(V) 580-605",
+            "Watt": 580,
+            "Width_m": 2.278,
+            "Length_m": 1.134,
+            "Thick(mm.)": 30,
+            "Price": NaN,
+            "Datasheet": NaN,
+            "URL": NaN
+        },
+        {
+            "no": NaN,
+            "Brand": NaN,
+            "Series": "Tiger Neo N-type 72HL4-(V) 580-606",
+            "Watt": 585,
+            "Width_m": 2.278,
+            "Length_m": 1.134,
+            "Thick(mm.)": 30,
+            "Price": NaN,
+            "Datasheet": NaN,
+            "URL": NaN
+        }
+    ]
+}

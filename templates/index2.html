@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>คำนวณค่าไฟฟ้า</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+  <style>
+    .solar-heading {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #0d6efd; /* Bootstrap Blue */
+      background: none;
+      position: relative;
+      line-height: 1.2;
+    }
+  </style>
+</head>
+
+<body class="bg-light py-5">
+  <div class="container py-4">
+
+    <!-- ✅ ใส่เมนูตรงนี้เลย -->
+    <div class="mb-4">
+      <div class="d-flex flex-wrap gap-2 ms-1">
+        <div>
+          <a href="/" class="btn btn-outline-secondary btn-sm">← กลับหน้าหลัก</a>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="/Project_Estimation" class="btn btn-outline-primary btn-sm">📏 ประมาณการติดตั้งโซลาร์เซลล์</a>
+          <a href="/Cal_electric_price/" class="btn btn-outline-primary btn-sm">💡 คำนวณค่าไฟฟ้าแบบอัตราก้าวหน้า</a>
+          <a href="/ROI_Cal" class="btn btn-outline-primary btn-sm">🔥 คำนวณ ROI ระยะคืนทุน</a>
+          <a href="/Solarpanel" class="btn btn-outline-primary btn-sm">🛠️ ออกแบบติดตั้งแผงโซลาร์เซลล์</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- แล้วตามด้วย card หลัก -->
+    <div class="card shadow-lg rounded-4 p-4 mx-auto" style="max-width: 960px;">
+
+      <h1 class="solar-heading">⚡ โปรแกรม <span>คำนวณค่าไฟฟ้าแบบอัตราก้าวหน้า</span></h1>
+
+      <form method="POST" action="/Cal_electric_price/" id="electricityForm">
+
+        <div class="mb-3">
+          <label for="current_month" class="form-label">เลือกเดือนปัจจุบัน:</label>
+          <select id="current_month" name="current_month" class="form-select">
+            {% for i in range(1, 13) %}
+            <option value="{{ i }}" {% if form_data and form_data.current_month == i %} selected {% endif %}>
+              {{ ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+              "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"][i-1] }}
+            </option>
+            {% endfor %}
+          </select>          
+        </div>
+
+        <div class="mb-3">
+          <label for="current_units" class="form-label">หน่วยไฟฟ้าเดือนปัจจุบัน:</label>
+          <input type="number" id="current_units" name="current_units" class="form-control" required min="0"
+          value="{{ form_data.current_units if form_data else '' }}">    
+        </div>
+
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="enable_history" name="enable_history"
+            {% if form_data and form_data.enable_history %} checked {% endif %} onchange="toggleHistoryInputs()">
+
+          <label class="form-check-label" for="enable_history">เปิดใช้งานคำนวณย้อนหลัง</label>
+        </div>
+
+        <div id="history_section" style="display: none;">
+          <div class="mb-3">
+            <label for="month_count" class="form-label">เลือกจำนวนเดือนที่จะคำนวณย้อนหลัง(สูงสุด 6 เดือน):</label>
+            <select id="month_count" name="month_count" class="form-select" onchange="updateMonthInputs()">
+              {% for i in range(1, 7) %}
+              <option value="{{ i }}" {% if form_data and form_data.month_count == i %} selected {% endif %}>{{ i }} เดือน</option>
+              {% endfor %}
+            </select>
+            
+          </div>
+
+          <div id="month_inputs">
+            {% if month_count and month_names and previous_units %}
+              {% for i in range(1, month_count + 1) %}
+                <div class="mb-2">
+                  <label>หน่วยไฟฟ้าเดือน {{ month_names[i-1] }}:</label>
+                  <input type="number" id="month{{i}}" name="month{{i}}" class="form-control" required min="0"
+                    value="{{ previous_units[i-1] }}">
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+          
+
+        <hr>
+        <h5 class="mb-3 fw-bold text-primary">💡 ต้องการลดค่าไฟ?</h5>
+
+        <div class="mb-3">
+          <label for="reduce_type" class="form-label">เลือกประเภท:</label>
+          <select id="reduce_type" name="reduce_type" class="form-select" onchange="toggleInputFields()">
+            <option value="">-- เลือกประเภท --</option>
+            <option value="unit" {% if form_data and form_data.reduce_type == 'unit' %} selected {% endif %}>ลดตามหน่วยไฟฟ้า</option>
+            <option value="money" {% if form_data and form_data.reduce_type == 'money' %} selected {% endif %}>ลดตามจำนวนเงิน</option>
+          </select>
+          
+        </div>
+
+        <div id="unit_input" style="display: none;" class="mb-3">
+          <label for="reduce_units" class="form-label">จำนวนหน่วยที่ต้องการลด:</label>
+          <input type="number" id="reduce_units" name="reduce_units" class="form-control"
+          value="{{ form_data.reduce_units if form_data else '' }}">
+        
+        </div>
+
+        <div id="money_input" style="display: none;" class="mb-3">
+          <label for="reduce_money" class="form-label">จำนวนเงินที่ต้องการลด (บาท):</label>
+          <input type="number" id="reduce_money" name="reduce_money" class="form-control"
+          value="{{ form_data.reduce_money if form_data else '' }}">
+        
+        </div>
+
+        <input type="hidden" id="month_count_hidden" name="month_count">
+        <input type="hidden" id="current_month_hidden" name="current_month">
+
+        <div class="d-flex justify-content-center gap-2 mt-4">
+          <button type="submit" class="btn btn-success">คำนวณ</button>
+          <button type="button" class="btn btn-outline-danger" onclick="resetForm()">รีเซ็ต</button>
+        </div>
+        
+      </form>
+
+      {% if individual_costs and individual_costs|length > 0 and previous_units and previous_units|sum > 0 %}
+      <div class="card mt-5">
+        <div class="card-body">
+          <h5 class="card-title">รายละเอียดค่าไฟฟ้า</h5>
+          <div class="table-responsive">
+            <table class="table table-bordered text-center align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>เดือน</th>
+                  <th>หน่วยไฟฟ้า (หน่วย)</th>
+                  <th>ค่าไฟ (บาท)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if month_names|length == previous_units|length and month_names|length == individual_costs|length %}
+                {% for i in range(month_names|length) %}
+                <tr>
+                  <td>{{ month_names[i] }}</td>
+                  <td>{{ previous_units[i] }}</td>
+                  <td>{{ individual_costs[i] }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="table-info">
+                  <td><strong>เฉลี่ย</strong></td>
+                  <td><strong>{{ avg_units | round(2) }}</strong></td>
+                  <td><strong>{{ avg_cost | round(2) }}</strong></td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="3" class="text-danger text-center">⚠ ข้อมูลไม่ครบ กรุณาตรวจสอบการส่งค่า</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if reduce_type and (reduce_units > 0 or reduce_money > 0) %}
+      <div class="card mt-4">
+        <div class="card-body">
+          <h5 class="card-title">ผลลัพธ์หลังลดค่าไฟ:</h5>
+          {% if reduce_type == "unit" %}
+          <p><strong>ลดหน่วยไฟ:</strong> {{ reduce_units }} หน่วย</p>
+          <p><strong>หน่วยที่เหลือ:</strong> {{ new_units | round(0) | int }} หน่วย</p>
+          <p><strong>ค่าไฟใหม่:</strong> {{ new_cost }} บาท</p>
+          {% elif reduce_type == "money" %}
+          <p><strong>ลดค่าไฟ:</strong> {{ reduce_money }} บาท</p>
+          <p><strong>ลดได้:</strong> {{ reduced_units }} หน่วย</p>
+          <p><strong>หน่วยที่เหลือ:</strong> {{ new_units if new_units is not none else 0 }} หน่วย</p>
+          <p><strong>ค่าไฟใหม่:</strong> {{ new_cost if new_cost is not none else 0 }} บาท</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="text-center mt-4">
+        <button type="button" id="resetFormButton" onclick="resetForm_cal()" class="btn btn-outline-danger" style="display: none;">รีเซ็ตข้อมูล</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const previousUnits = {{ (form_data.previous_units if form_data and form_data.previous_units else []) | tojson }};
+</script>
+<script>
+  // ดักตอน refresh แล้วรีเซ็ต
+  window.addEventListener('beforeunload', function (e) {
+      navigator.sendBeacon('/Cal_electric_price/reset');
+  });
+</script>
+
+<script src="{{ url_for('static', filename='script2.js') }}"></script>
+</body>
+</html>

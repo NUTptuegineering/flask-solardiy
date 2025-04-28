@@ -1,0 +1,30 @@
+/* ตั้งค่าพื้นหลังและสีข้อความหลัก */
+body {
+    background-color: #333; /* สีเทาเข้ม */
+    color: white; /* สีข้อความเป็นสีขาว */
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+/* หัวข้อ */
+h2, h3 {
+    color: #ffcc00; /* สีเหลือง */
+}
+
+/* ปรับสีฟอร์ม */
+label, p {
+    color: white;
+}
+
+
+button:hover {
+    background-color: #ff9900;
+}
+
+/* ช่องกรอกข้อมูล */
+select, input {
+    background-color: #555;
+    color: white;
+    border: 1px solid white;
+    padding: 5px;
+}

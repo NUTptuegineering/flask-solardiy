@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คำนวณค่าไฟฟ้า</title>
+</head>
+<body>
+    <h2>โปรแกรมคำนวณค่าไฟฟ้าแบบอัตราก้าวหน้า</h2>
+    
+    <form method="POST">
+        <label for="current_month">เลือกเดือนปัจจุบัน:</label>
+        <select id="current_month" name="current_month" onchange="updateMonthInputs()">
+            <option value="1">มกราคม</option>
+            <option value="2">กุมภาพันธ์</option>
+            <option value="3">มีนาคม</option>
+            <option value="4">เมษายน</option>
+            <option value="5">พฤษภาคม</option>
+            <option value="6">มิถุนายน</option>
+            <option value="7">กรกฎาคม</option>
+            <option value="8">สิงหาคม</option>
+            <option value="9">กันยายน</option>
+            <option value="10">ตุลาคม</option>
+            <option value="11">พฤศจิกายน</option>
+            <option value="12">ธันวาคม</option>
+        </select>
+        
+        <br><br>
+        <label for="month_count">เลือกจำนวนเดือนย้อนหลัง:</label>
+        <select id="month_count" name="month_count" onchange="updateMonthInputs()">
+            <option value="1">1 เดือน</option>
+            <option value="2">2 เดือน</option>
+            <option value="3">3 เดือน</option>
+        </select>
+        
+        <br><br>
+        <div id="month_inputs"></div>
+        
+        <button type="submit">คำนวณ</button>
+    </form>
+    
+    {% if total_cost is not none and month_names is defined %}
+        <h3>ค่าไฟฟ้าของแต่ละเดือน (รวม VAT 7%):</h3>
+        <ul>
+            {% for i in range(individual_costs|length) %}
+                <li>เดือน {{ month_names[i] }}: {{ individual_costs[i] }} บาท</li>
+            {% endfor %}
+        </ul>
+        <h3>รวมทั้งหมด: {{ total_cost }} บาท</h3>
+    {% else %}
+        <h3>กรุณากรอกข้อมูลและกดคำนวณ</h3>
+    {% endif %}
+    
+    <script>
+        function updateMonthInputs() {
+            let monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+            let currentMonth = parseInt(document.getElementById("current_month").value);
+            let monthCount = parseInt(document.getElementById("month_count").value);
+            let inputContainer = document.getElementById("month_inputs");
+            inputContainer.innerHTML = "";
+            
+            for (let i = 0; i < monthCount; i++) {
+                let monthIndex = (currentMonth - 1 - i + 12) % 12;
+                let label = document.createElement("label");
+                label.innerText = "หน่วยไฟฟ้าเดือน " + monthNames[monthIndex] + ": ";
+                let input = document.createElement("input");
+                input.type = "number";
+                input.name = "month" + (i + 1);
+                input.required = true;
+                inputContainer.appendChild(label);
+                inputContainer.appendChild(input);
+                inputContainer.appendChild(document.createElement("br"));
+            }
+        }
+        
+        window.onload = updateMonthInputs;
+    </script>
+</body>
+</html>
