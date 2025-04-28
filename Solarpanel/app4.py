@@ -82,16 +82,17 @@ def generate_plot(roof_width, roof_length, num_panels_requested, center_align, p
     rail_offset = panel_width * 0.15
 
     for i, panels_in_this_row in enumerate(panels_per_row):
-        start_x = (roof_length - (panels_in_this_row * (panel_length + spacing) - spacing)) / 2 if center_align else margin_length
+        start_x = (roof_length - (panels_in_this_row * (panel_length + spacing) - spacing)) / 2 if center_align else margin_length + rail_margin_x
 
         panel_y_top = start_y + i * (panel_width + row_spacing) + panel_width - rail_offset
         panel_y_bottom = start_y + i * (panel_width + row_spacing) + rail_offset
 
         for j in range(panels_in_this_row - 1):
-            panel_x = start_x + (j + 1) * (panel_length + spacing)
+            panel_x = start_x + j * (panel_length + spacing) + panel_length
             middle_clamp_positions.append((panel_x, panel_y_top))
             middle_clamp_positions.append((panel_x, panel_y_bottom))
             middle_clamp_count += 2
+
 
     ax.scatter([], [], color='red', s=50, label="Rail Connector")
     ax.scatter([], [], color='blue', s=50, label="End Clamp")
