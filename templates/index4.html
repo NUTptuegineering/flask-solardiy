@@ -9,25 +9,27 @@
   <style>
       .solar-heading {
         text-align: center;
-        font-size: 2rem; /* 🔵 ปรับจาก 2.5rem -> 2rem */
+        font-size: 2rem;
         font-weight: 700;
         margin-bottom: 1.5rem;
-        color: #0d6efd; /* Bootstrap Blue */
-        background: none;
-        position: relative;
+        color: #0d6efd;
         line-height: 1.2;
       }
-    #layout-image {
-      max-width: 100%;
-      height: auto;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      margin-top: 20px;
-    }
-    #layout {
-      text-align: center;
-      margin-top: 20px;
-    }
+      #layout {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+        min-height: 60vh;
+      }
+      #layout-image {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
   </style>
 </head>
 <body class="bg-light py-5">
@@ -36,9 +38,7 @@
     <!-- 🔹 เมนูด้านบน -->
     <div class="mb-4">
       <div class="d-flex flex-wrap gap-2 ms-1">
-        <div>
-          <a href="/" class="btn btn-outline-secondary btn-sm">← กลับหน้าหลัก</a>
-        </div>
+        <div><a href="/" class="btn btn-outline-secondary btn-sm">← กลับหน้าหลัก</a></div>
         <div class="d-flex flex-wrap gap-2">
           <a href="/Project_Estimation" class="btn btn-outline-primary btn-sm">📏 ประมาณการติดตั้งโซลาร์เซลล์</a>
           <a href="/Cal_electric_price/" class="btn btn-outline-primary btn-sm">💡 คำนวณค่าไฟฟ้าแบบอัตราก้าวหน้า</a>
@@ -48,87 +48,82 @@
       </div>
     </div>
 
+    <!-- 🔹 ฟอร์มกรอกข้อมูล -->
     <div class="card shadow-lg rounded-4 p-4 mx-auto" style="max-width: 960px;">
       <h2 class="solar-heading">🛠️ ออกแบบติดตั้งแผงโซลาร์เซลล์บนหลังคา</h2>
     
       <form class="vstack gap-3">
-    
         <div class="row align-items-center">
-          <div class="col-auto">
-            <label for="roof-width" class="col-form-label">ความกว้างของหลังคา (เมตร):</label>
-          </div>
-          <div class="col">
-            <input type="number" class="form-control form-control-sm" id="roof-width" placeholder="เช่น 6">
-          </div>
+          <div class="col-auto"><label for="roof-width" class="col-form-label">ความกว้างของหลังคา (เมตร):</label></div>
+          <div class="col"><input type="number" class="form-control form-control-sm" id="roof-width" placeholder="เช่น 6"></div>
         </div>
-    
+
         <div class="row align-items-center">
-          <div class="col-auto">
-            <label for="roof-length" class="col-form-label">ความยาวของหลังคา (เมตร):</label>
-          </div>
-          <div class="col">
-            <input type="number" class="form-control form-control-sm" id="roof-length" placeholder="เช่น 8">
-          </div>
+          <div class="col-auto"><label for="roof-length" class="col-form-label">ความยาวของหลังคา (เมตร):</label></div>
+          <div class="col"><input type="number" class="form-control form-control-sm" id="roof-length" placeholder="เช่น 8"></div>
         </div>
-    
+
         <div class="row align-items-center">
-          <div class="col-auto">
-            <label for="panel-width" class="col-form-label">ความกว้างของแผง (เมตร):</label>
-          </div>
-          <div class="col">
-            <input type="number" class="form-control form-control-sm" id="panel-width" step="0.01" placeholder="เช่น 1.134">
-          </div>
+          <div class="col-auto"><label for="panel-width" class="col-form-label">ความกว้างของแผง (เมตร):</label></div>
+          <div class="col"><input type="number" class="form-control form-control-sm" id="panel-width" step="0.01" placeholder="เช่น 1.134"></div>
         </div>
-    
+
         <div class="row align-items-center">
-          <div class="col-auto">
-            <label for="panel-length" class="col-form-label">ความยาวของแผง (เมตร):</label>
-          </div>
-          <div class="col">
-            <input type="number" class="form-control form-control-sm" id="panel-length" step="0.01" placeholder="เช่น 2.278">
-          </div>
+          <div class="col-auto"><label for="panel-length" class="col-form-label">ความยาวของแผง (เมตร):</label></div>
+          <div class="col"><input type="number" class="form-control form-control-sm" id="panel-length" step="0.01" placeholder="เช่น 2.278"></div>
         </div>
-    
+
         <div class="row align-items-center">
-          <div class="col-auto">
-            <label for="num-panels" class="col-form-label">จำนวนแผงที่ต้องการ:</label>
-          </div>
-          <div class="col">
-            <input type="number" class="form-control form-control-sm" id="num-panels" placeholder="เช่น 10">
-          </div>
+          <div class="col-auto"><label for="num-panels" class="col-form-label">จำนวนแผงที่ต้องการ:</label></div>
+          <div class="col"><input type="number" class="form-control form-control-sm" id="num-panels" placeholder="เช่น 10"></div>
         </div>
-    
+
         <div class="d-flex justify-content-center">
           <div class="form-check">
             <input type="checkbox" class="form-check-input" id="center-align">
             <label class="form-check-label" for="center-align">จัดแผงให้อยู่กลางหลังคา</label>
           </div>
         </div>
-        
-    
+
         <div class="d-flex justify-content-center gap-2 mt-4">
           <button type="button" class="btn btn-success" onclick="generateLayout()">แสดงผลการจัดวาง</button>
           <button type="button" class="btn btn-outline-danger" onclick="resetForm()">รีเซ็ต</button>
         </div>
-        
-
       </form>
     </div>
-    
-    
 
-      <!-- ข้อความ Error และ Loading -->
-      <div id="error-message" class="text-danger mt-3 text-center"></div>
-      <div id="loading" class="text-muted mt-2 text-center" style="display: none;">กำลังโหลดข้อมูล...</div>
-    </div>
+    <!-- 🔹 Error & Loading -->
+    <div id="error-message" class="text-danger mt-3 text-center"></div>
+    <div id="loading" class="text-muted mt-2 text-center" style="display: none;">กำลังโหลดข้อมูล...</div>
 
     <!-- 🔹 Layout Output -->
-    <div class="card mt-4 p-4">
-      <div id="layout">
-        <img id="layout-image" src="" alt="ภาพการจัดวางแผงโซลาร์เซล" style="display: none;">
-        <div id="summary" class="mt-3"></div>
+    <div id="layout-card" class="card mt-4 p-4" style="display: none;">
+      <div id="layout" class="text-center">
+        <img id="layout-image" src="" alt="ภาพการจัดวางแผงโซลาร์เซลล์" class="img-fluid mb-4" style="display: none; max-height: 500px;">
+      </div>
+
+      <!-- 🔹 Summary -->
+      <div id="summary" class="mt-4" style="display: none;">
+        <h4 class="text-center mb-4">📊 รายงานสรุปผลการจัดวาง</h4>
+
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped text-center w-auto mx-auto">
+            <thead class="table-light">
+              <tr>
+                <th>รายการ</th>
+                <th>จำนวน</th>
+              </tr>
+            </thead>
+            <tbody id="summary-table-body">
+              <tr>
+                <td colspan="2" class="text-muted">– ยังไม่มีข้อมูล –</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
+
   </div>
 </body>
 </html>
