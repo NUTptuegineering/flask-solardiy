@@ -1,201 +1,245 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" data-bs-theme="light">
 <head>
   <meta charset="UTF-8">
-  <title>เลือกโปรแกรม</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solar Program Selector</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      font-family: sans-serif;
+      background: url('{{ url_for('static', filename='Picture1.png') }}') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Sarabun', sans-serif;
+      transition: background-color 0.4s, color 0.4s;
+      background-blend-mode: lighten;
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+    .overlay {
+      background: rgba(255, 255, 255, 0.9);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background-color: #1e1e1e;
-      margin: 0;
-      gap: 24px;
     }
-
-    h1 {
-      color: rgb(47, 217, 255);
+    .hero {
+      text-align: center;
+      padding: 60px 20px 30px 20px;
     }
-
-    .button-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;       /* ⭐ จัดปุ่มแนวนอนให้อยู่กลาง */
-      justify-content: center;   /* ⭐ จัดปุ่มแนวตั้งให้อยู่กลาง */
-      gap: 20px;
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #007bff, #00c6ff);
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 10px;
     }
-
-
-    .animated-button {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 16px 36px;
-      border: 4px solid;
-      border-color: transparent;
-      font-size: 16px;
-      background-color: inherit;
-      border-radius: 100px;
+    .hero p {
+      font-size: 1.4rem;
+      color: #555;
+    }
+    .program-card {
+      background: #ffffff;
+      padding: 30px 20px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+      height: 100%;
+    }
+    .program-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+    }
+    .program-card img {
+      margin-bottom: 20px;
+      height: 64px;
+    }
+    .program-card h5 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .program-card p {
+      font-size: 0.95rem;
+      color: #777;
+      margin-bottom: 20px;
+    }
+    .btn-choose {
+      background: linear-gradient(90deg, #007bff, #00c6ff);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 50px;
       font-weight: 600;
-      color: rgb(47, 252, 255);
-      box-shadow: 0 0 0 2px rgb(126, 207, 184);
-      cursor: pointer;
-      overflow: hidden;
-      transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+      text-decoration: none;
+      transition: background 0.3s;
+      display: inline-block;
+    }
+    .btn-choose:hover {
+      background: linear-gradient(90deg, #0056b3, #00a2d8);
+    }
+    footer {
+      background: #0d6efd;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: auto;
+      font-size: 0.9rem;
+    }
+    .toggle-container {
+      position: fixed;
+      top: 20px; /* 👈 จาก bottom ➔ เป็น top */
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 8px 14px;
+      border-radius: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
-    .animated-button svg {
-      position: absolute;
-      width: 24px;
-      fill: greenyellow;
-      z-index: 9;
-      transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    .toggle-container span {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #333;
     }
-
-    .animated-button .arr-1 {
-      right: 16px;
-    }
-
-    .animated-button .arr-2 {
-      left: -25%;
-    }
-
-    .animated-button .circle {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 20px;
-      height: 20px;
-      background-color: greenyellow;
-      border-radius: 50%;
-      opacity: 0;
-      transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-
-    .animated-button .text {
+    .switch {
       position: relative;
-      z-index: 1;
-      transform: translateX(-12px);
-      transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #0d6efd;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
     }
 
-    .animated-button:hover {
-      box-shadow: 0 0 0 12px transparent;
-      color: #212121;
-      border-radius: 12px;
+    .dark-mode .overlay {
+      background: rgba(18, 18, 18, 0.9);
+      color: #ccc;
     }
 
-    .animated-button:hover .arr-1 {
-      right: -25%;
+    .dark-mode .program-card {
+      background: #1e1e1e;
+      box-shadow: 0 6px 20px rgba(255,255,255,0.08);
     }
-
-    .animated-button:hover .arr-2 {
-      left: 16px;
+    .dark-mode .program-card h5,
+    .dark-mode .program-card p {
+      color: #eee;
     }
-
-    .animated-button:hover .text {
-      transform: translateX(12px);
+    .dark-mode footer {
+      background-color: #1e1e1e;
+      color: #aaa;
     }
-
-    .animated-button:hover svg {
-      fill: #212121;
+    .dark-mode .program-card img {
+      filter: invert(1);
     }
-
-    .animated-button:active {
-      scale: 0.95;
-      box-shadow: 0 0 0 4px greenyellow;
-    }
-
-    .animated-button:hover .circle {
-      width: 500px;
-      height: 500px;
-      opacity: 1;
-    }
-
-    /* ทำให้ปุ่มทำหน้าที่เหมือนลิงก์ */
-    form {
-      margin: 0;
-    }
-    .fade {
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.6s ease;
-    }
-
-    .fade.show {
-    opacity: 1;
-    transform: translateY(0);
-    }
-
-
   </style>
 </head>
+
 <body>
-    <h1 class="fade show">The Auxiliary Program for Design</h1>
-    <h1 class="fade show">and Estimation the Cost of Solar Cell Installation</h1>
-    <h1 id="heading2" class="fade">เลือกโปรแกรมที่ต้องการใช้งาน</h1>
-    <div class="button-group fade" id="buttonGroup">
-    <form action="/Project_Estimation">
-      <button type="submit" class="animated-button">
-        <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
-          <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-        </svg>
-        <span class="text">ประมาณการติดตั้งโซลาร์เซลล์</span>
-        <span class="circle"></span>
-        <svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg">
-          <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-        </svg>
-      </button>
-    </form>
+  <div class="overlay">
+    <section class="hero">
+      <h1>The Auxiliary Program</h1>
+      <p>for Design and Estimation the Cost of Solar Cell Installation</p>
+    </section>
 
+    <section class="container my-4">
+      <div class="row g-4 justify-content-center">
+        <div class="col-md-6 col-lg-3">
+          <a href="/Project_Estimation" class="program-card d-block text-decoration-none">
+            <img src="{{ url_for('static', filename='Picture2.png') }}" alt="BOQ Calculator" style="width: 80px; height: 80px; margin-bottom: 20px; object-fit: contain;">
+            <h5>ประมาณการติดตั้งโซลาร์เซลล์</h5>
+            <p>ช่วยคำนวณขนาดและต้นทุนเบื้องต้น</p>
+            <div class="btn-choose">เลือกโปรแกรม</div>
+          </a>
+          
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <a href="/Cal_electric_price/" class="program-card d-block text-decoration-none">
+            <img src="{{ url_for('static', filename='Picture3.png') }}" alt="Electric Bill Calculator" style="width: 80px; height: 80px; margin-bottom: 20px; object-fit: contain;">
+            <h5>คำนวณค่าไฟฟ้า</h5>
+            <p>คำนวณค่าไฟฟ้าแบบอัตราก้าวหน้า</p>
+            <div class="btn-choose">เลือกโปรแกรม</div>
+          </a>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <a href="/ROI_Cal" class="program-card d-block text-decoration-none">
+            <img src="{{ url_for('static', filename='Picture4.png') }}" alt="Graph Money" style="width: 80px; height: 80px; margin-bottom: 20px; object-fit: contain;">
+            <h5>คำนวณ ROI ระยะคืนทุน</h5>
+            <p>คำนวณเวลาคืนทุนจากการลงทุน</p>
+            <div class="btn-choose">เลือกโปรแกรม</div>
+          </a>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <a href="/Solarpanel" class="program-card d-block text-decoration-none">
+            <img src="{{ url_for('static', filename='Picture5.png') }}" alt="Solar Panel" style="width: 80px; height: 80px; margin-bottom: 20px; object-fit: contain;">
+            <h5>ออกแบบติดตั้งแผงโซลาร์เซลล์</h5>
+            <p>จำลองการจัดวางแผงบนหลังคา</p>
+            <div class="btn-choose">เลือกโปรแกรม</div>
+          </a>
+        </div>
+      </div>
+    </section>
 
-    <form method="POST" action="/Cal_electric_price/">
+    <footer>
+      This website is developed as part of an Electrical Engineering Senior Project at Pathumthani University (มหาวิทยาลัยปทุมธานี). For academic purposes only.
+      © 2025 All Rights Reserved.
       
-      <button type="submit" class="animated-button">
-        <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
-          <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-        </svg>
-        <span class="text">คำนวณค่าไฟฟ้าแบบอัตราก้าวหน้า</span>
-        <span class="circle"></span>
-        <svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg">
-          <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-        </svg>
-      </button>
-    </form>
 
-    <form action="/ROI_Cal">
-      <button type="submit" class="animated-button">
-        <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
-          <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-        </svg>
-        <span class="text">คำนวณ ROI ระยะคืนทุนการติดตั้ง Solar Rooftop</span>
-        <span class="circle"></span>
-        <svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg">
-          <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-        </svg>
-      </button>
-    </form>
-
-    <form action="/Solarpanel">
-        <button type="submit" class="animated-button">
-          <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
-            <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-          </svg>
-          <span class="text">ออกแบบติดตั้งแผงโซลาร์เซลล์</span>
-          <span class="circle"></span>
-          <svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg">
-            <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-          </svg>
-        </button>
-      </form>
+    </footer>
   </div>
 
-</body>
-<script src="{{ url_for('static', filename='script.js') }}"></script>
+  <div class="toggle-container">
+    <span>☀️ Light</span>
+    <label class="switch">
+      <input type="checkbox" onclick="toggleDarkMode()">
+      <span class="slider"></span>
+    </label>
+    <span>🌙 Dark</span>
+  </div>
 
+  <script>
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      if (html.getAttribute('data-bs-theme') === 'dark') {
+        html.setAttribute('data-bs-theme', 'light');
+        document.body.classList.remove('dark-mode');
+      } else {
+        html.setAttribute('data-bs-theme', 'dark');
+        document.body.classList.add('dark-mode');
+      }
+    }
+  </script>
+</body>
 </html>
