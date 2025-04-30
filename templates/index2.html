@@ -8,6 +8,46 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
   <style>
+    .btn-choose {
+      background: linear-gradient(to right, #89b6da, #c7d6e2); /* เปลี่ยนจากฟ้าสด */
+      color: #003366;
+      font-weight: 600;
+      border: none;
+      border-radius: 30px;
+      padding: 8px 16px;
+      font-size: 14px;
+      box-shadow: 0 2px 6px rgba(0, 123, 255, 0.1);
+      transition: 0.3s ease;
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .btn-choose:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+      text-decoration: none;
+    }
+
+
+    .btn-back-home {
+      background: linear-gradient(to right, #89b6da, #c7d6e2); /* เปลี่ยนจากฟ้าสด */
+      color: #003366;
+      font-weight: 600;
+      border: none;
+      border-radius: 30px;
+      padding: 8px 16px;
+      font-size: 14px;
+      box-shadow: 0 2px 6px rgba(0, 123, 255, 0.1);
+      transition: 0.3s ease;
+      display: inline-block;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .btn-back-home:hover {
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+    }
     .solar-heading {
       text-align: center;
       font-size: 2.5rem;
@@ -22,22 +62,15 @@
 </head>
 
 <body class="bg-light py-5">
-  <div class="container py-4">
-
-    <!-- ✅ ใส่เมนูตรงนี้เลย -->
-    <div class="mb-4">
-      <div class="d-flex flex-wrap gap-2 ms-1">
-        <div>
-          <a href="/" class="btn btn-outline-secondary btn-sm">← กลับหน้าหลัก</a>
-        </div>
-        <div class="d-flex flex-wrap gap-2">
-          <a href="/Project_Estimation" class="btn btn-outline-primary btn-sm">📏 ประมาณการติดตั้งโซลาร์เซลล์</a>
-          <a href="/Cal_electric_price/" class="btn btn-outline-primary btn-sm">💡 คำนวณค่าไฟฟ้าแบบอัตราก้าวหน้า</a>
-          <a href="/ROI_Cal" class="btn btn-outline-primary btn-sm">🔥 คำนวณ ROI ระยะคืนทุน</a>
-          <a href="/Solarpanel" class="btn btn-outline-primary btn-sm">🛠️ ออกแบบติดตั้งแผงโซลาร์เซลล์</a>
-        </div>
-      </div>
+  <div class="text-center my-4">
+    <div class="d-inline-flex flex-wrap justify-content-center gap-2">
+      <a href="/" class="btn-back-home">← กลับหน้าหลัก</a>
+      <a href="/Project_Estimation" class="btn-choose text-decoration-none">📏 ประมาณการติดตั้งโซลาร์เซลล์</a>
+      <a href="/Cal_electric_price/" class="btn-choose text-decoration-none">💡 คำนวณค่าไฟฟ้าแบบอัตราก้าวหน้า</a>
+      <a href="/ROI_Cal" class="btn-choose text-decoration-none">🔥 คำนวณ ROI ระยะคืนทุน</a>
+      <a href="/Solarpanel" class="btn-choose text-decoration-none">🛠️ ออกแบบติดตั้งแผงโซลาร์เซลล์</a>
     </div>
+  </div>
 
     <!-- แล้วตามด้วย card หลัก -->
     <div class="card shadow-lg rounded-4 p-4 mx-auto" style="max-width: 960px;">
