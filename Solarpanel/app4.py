@@ -26,7 +26,6 @@ def generate_plot(roof_width, roof_length, num_panels_requested, center_align, p
     import io
     import base64
 
-    # ค่าเริ่มต้น
     margin_width = 0.3
     margin_length = 0.5
     spacing = 0.02
@@ -43,6 +42,14 @@ def generate_plot(roof_width, roof_length, num_panels_requested, center_align, p
     max_panels_along_length = int(usable_length // panel_length)
 
     total_panels = min(max_panels_along_width * max_panels_along_length, num_panels_requested)
+    print(f"🧮 max แผงที่วางได้: {max_panels_along_width * max_panels_along_length}, ผู้ใช้ขอ: {num_panels_requested}, วางจริง: {total_panels}")
+    max_possible_panels = max_panels_along_width * max_panels_along_length
+    warning_message = None
+    if num_panels_requested > max_possible_panels:
+        warning_message = f"คุณใส่ {num_panels_requested} แผง แต่หลังคาวางได้สูงสุด {max_possible_panels} แผง ระบบจะวางให้ {max_possible_panels} แผงแทน"
+
+    total_panels = min(max_possible_panels, num_panels_requested)
+
 
     if total_panels == 0:
         return None, 0, 0, None, None, 0, 0, "ขนาดหลังคาไม่เพียงพอสำหรับการวางแผง"
@@ -162,7 +169,7 @@ def generate_plot(roof_width, roof_length, num_panels_requested, center_align, p
 
     rail_summary = summarize_rails(rails_used)
 
-    return img_data, total_panels, rails_used, rail_summary, rail_connectors, len(end_clamp_positions), middle_clamp_count, None
+    return img_data, total_panels, rails_used, rail_summary, rail_connectors, len(end_clamp_positions), middle_clamp_count, warning_message
 
 # ช่วย function ย่อย
 def select_rail_combination(required_length, rail_sizes):
@@ -230,8 +237,8 @@ def generate():
         roof_length = float(data["length"])
         num_panels_requested = float(data["numPanels"])
         center_align = data.get("centerAlign", False)
-        panel_width = float(data["panelLength"])  # รับ length มาใส่ width
-        panel_length = float(data["panelWidth"])  # รับ width มาใส่ length
+        panel_width = float(data["panelLength"])
+        panel_length = float(data["panelWidth"])
 
 
 
@@ -251,10 +258,7 @@ def generate():
             panel_length
         )
 
-        plot_url, total_panels, rails_used, rail_summary, rail_connectors, end_clamps, middle_clamp_count, error_message = result
-
-        if error_message:
-            return jsonify({"error": error_message, "max_panels": total_panels}), 400
+        plot_url, total_panels, rails_used, rail_summary, rail_connectors, end_clamps, middle_clamp_count, warning_message = result
 
         if rail_summary is None:
             rail_summary = {}
@@ -265,8 +269,10 @@ def generate():
             "rail_summary": rail_summary,
             "rail_connector_count": rail_connectors,
             "end_clamp_count": end_clamps,
-            "middle_clamp_count": middle_clamp_count
+            "middle_clamp_count": middle_clamp_count,
+            "warning": warning_message  # ✅ เพิ่มตรงนี้
         })
+
 
     except KeyError as ke:
         print("❌ ข้อมูลไม่ครบ:", str(ke))
