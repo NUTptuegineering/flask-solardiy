@@ -279,7 +279,13 @@ async function drawRectangle() {
 
     const totalEnergyForBattery = totalEnergyPerDay * selectedBackupDays;
     const requiredBatteryCapacityWh = (totalEnergyForBattery / 0.8).toFixed(2);
-    const requiredSolarPowerW = (totalEnergyPerDay / 0.8 / 4).toFixed(2);
+    const sunHoursInput = document.getElementById("sunHoursInput");
+    const sunHours = parseFloat(sunHoursInput?.value) || 4;  // fallback เป็น 4 ถ้าไม่ได้ใส่
+    
+    console.log("🌞 ชั่วโมงแดดเฉลี่ยที่ใช้ในการคำนวณ =", sunHours);
+    
+    const requiredSolarPowerW = (totalEnergyPerDay / 0.8 / sunHours).toFixed(2);
+    
 
     solarInstallationDisplay.innerHTML = `<strong>⚡ กำลังติดตั้งแผงโซลาร์เซลล์ที่ต้องใช้: ${requiredSolarPowerW} W</strong>`;
     priceSummary.classList.add("d-none");
@@ -640,14 +646,12 @@ async function handleOnGridCalculation() {
     if (!reductionInput || !outputDiv || !province) return;
 
     const desiredReduction = parseFloat(reductionInput.value);
-    if (isNaN(desiredReduction) || desiredReduction <= 0) {
-        alert("กรุณากรอกจำนวนหน่วยที่ต้องการลดต่อเดือนให้ถูกต้อง");
-        return;
-    }
-
-    const pvout = await getPvoutForProvince(province);
-    const bufferFactor = 1.2;
-    const requiredKw = (desiredReduction / pvout * bufferFactor).toFixed(2);
+    const sunHours = parseFloat(document.getElementById("sunHoursInput")?.value) || 4;
+    //const bufferFactor = 1.2;
+    
+    const dailyReduction = desiredReduction / 30;  // ✅ หาร 30 ก่อน
+    const requiredKw = (dailyReduction / sunHours).toFixed(2);
+    
 
     outputDiv.textContent = `ขนาดระบบที่ต้องใช้: ${requiredKw} kWp`;
 
@@ -1181,9 +1185,7 @@ async function loadSolarPanelOptions(panelContainer, totalEnergy, isOnGrid = fal
         const data = JSON.parse(sanitizedText);
 
         if (data.status === "success") {
-            const requiredSolarPowerKWp = isOnGrid
-                ? (totalEnergy / 120).toFixed(2)
-                : (totalEnergy / 0.8 / 4 / 1000).toFixed(2);
+            const requiredSolarPowerKWp = (totalEnergy / 1000).toFixed(2);  // ✅ ใช้ค่าที่คำนวณมาจากข้างนอกแล้ว
 
             console.log(`📐 ขนาดระบบที่แนะนำจาก panel: ${requiredSolarPowerKWp} kWp`);
             const requiredSolarPowerW = (requiredSolarPowerKWp * 1000).toFixed(2);
