@@ -79,23 +79,25 @@ def index():
         new_cost = total_cost
         reduced_units = 0
 
-        if reduce_type == "unit":
-            if enable_history and month_count > 0:
-                total_months = month_count + 1
-                avg_units_per_month = total_units / total_months
-            else:
-                avg_units_per_month = current_units
+        # ✅ คำนวณให้ใช้ร่วมกันได้
+        if enable_history and month_count > 0:
+            total_months = month_count + 1
+            avg_units_per_month = total_units / total_months
+        else:
+            total_months = 1
+            avg_units_per_month = current_units
 
+        if reduce_type == "unit":
             new_units = max(0, avg_units_per_month - reduce_units)
             new_cost = calculate_electricity_bill(new_units)
 
         elif reduce_type == "money":
-            # หา "จำนวนหน่วยไฟใหม่เฉลี่ย/เดือน" ที่ทำให้ค่าไฟ ≈ เป้าหมาย
             target_total_cost = total_cost - reduce_money
-            new_avg_units = find_units_from_cost(target_total_cost / total_months)  # ใช้หารเฉลี่ยต่อเดือน
+            new_avg_units = find_units_from_cost(target_total_cost / total_months)
+            reduced_units = avg_units_per_month - new_avg_units
             new_units = new_avg_units
-            reduced_units = avg_units_per_month - new_units
-            new_cost = calculate_electricity_bill(new_units)
+            new_cost = calculate_electricity_bill(new_avg_units)
+
 
 
         # ✅ เก็บข้อมูลลง session
