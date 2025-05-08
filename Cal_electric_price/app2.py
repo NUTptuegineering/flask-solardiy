@@ -90,10 +90,13 @@ def index():
             new_cost = calculate_electricity_bill(new_units)
 
         elif reduce_type == "money":
-            remaining_cost = max(0, total_cost - reduce_money)
-            reduced_units = find_units_from_cost(remaining_cost)
-            new_units = max(0, total_units - reduced_units)
+            # หา "จำนวนหน่วยไฟใหม่เฉลี่ย/เดือน" ที่ทำให้ค่าไฟ ≈ เป้าหมาย
+            target_total_cost = total_cost - reduce_money
+            new_avg_units = find_units_from_cost(target_total_cost / total_months)  # ใช้หารเฉลี่ยต่อเดือน
+            new_units = new_avg_units
+            reduced_units = avg_units_per_month - new_units
             new_cost = calculate_electricity_bill(new_units)
+
 
         # ✅ เก็บข้อมูลลง session
         session['data'] = {
