@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 
 program3_bp = Blueprint('ROI_Cal', __name__, template_folder='../templates', static_folder='../static')
 
-program3_bp.secret_key = 'your-secret-key'  # อย่าลืมตั้งค่าใน app.py ด้วย
+program3_bp.secret_key = 'your-secret-key'
 
 def safe_float(value, default=0.0):
     try:
@@ -25,7 +25,6 @@ def index():
         profit = round(total_save - cost, 2)
         roi = round((profit / cost) * 100, 2) if cost != 0 else 0
 
-        # เก็บข้อมูลไว้ใน session
         session['result'] = {
             'cost': f"{cost:,.2f}",
             'size': f"{size:,.2f}",
@@ -43,7 +42,6 @@ def index():
 
         return redirect(url_for('ROI_Cal.index'))
 
-    # ดึงค่ากลับเพื่อแสดงผลใน form
     result = session.pop('result', None)
     cost = session.pop('cost', None)
     size = session.pop('size', None)
