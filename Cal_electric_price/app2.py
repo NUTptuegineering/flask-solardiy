@@ -12,7 +12,6 @@ def calculate_electricity_bill(units):
         (250, 4.2218),
         (float('inf'), 4.4217)
     ]
-    service_charge = 24.62
 
     total_cost = 0
     for limit, rate in rates:
@@ -22,7 +21,6 @@ def calculate_electricity_bill(units):
         if units <= 0:
             break
 
-    total_cost += service_charge
     total_with_vat = total_cost * 1.07
     return round(total_with_vat, 2)
 
@@ -52,23 +50,17 @@ def index():
         month_units = []
 
         if enable_history:
-            for i in range(1, month_count + 1):  # ✅ วน 1,2,3,...
+            for i in range(1, month_count + 1):
                 month_index = (current_month - i + 11) % 12
                 month_name = month_labels[month_index]
                 units = request.form.get(f'month{i}', "0")
                 units = int(units) if units.isdigit() else 0
                 month_units.append((month_name, units))
 
-
-        # ✅ ใส่เดือนปัจจุบันไว้ข้างหน้า
         month_units = [(month_labels[current_month - 1], current_units)] + month_units
 
-
-        # แยกออกมา
         month_names = [item[0] for item in month_units]
         previous_units = [item[1] for item in month_units]
-
-
 
         individual_costs = [calculate_electricity_bill(units) for units in previous_units]
 
@@ -79,28 +71,29 @@ def index():
         new_cost = total_cost
         reduced_units = 0
 
-        # ✅ คำนวณให้ใช้ร่วมกันได้
         if enable_history and month_count > 0:
             total_months = month_count + 1
             avg_units_per_month = total_units / total_months
+            avg_cost_per_month = total_cost / total_months
         else:
             total_months = 1
             avg_units_per_month = current_units
+            avg_cost_per_month = total_cost
 
         if reduce_type == "unit":
             new_units = max(0, avg_units_per_month - reduce_units)
             new_cost = calculate_electricity_bill(new_units)
 
         elif reduce_type == "money":
-            target_total_cost = total_cost - reduce_money
-            new_avg_units = find_units_from_cost(target_total_cost / total_months)
-            reduced_units = avg_units_per_month - new_avg_units
-            new_units = new_avg_units
+            target_avg_cost = avg_cost_per_month - reduce_money
+            new_avg_units = find_units_from_cost(target_avg_cost)
             new_cost = calculate_electricity_bill(new_avg_units)
 
+            reduced_units = avg_units_per_month - new_avg_units
+            actual_money_saved = avg_cost_per_month - new_cost
 
+            new_units = new_avg_units
 
-        # ✅ เก็บข้อมูลลง session
         session['data'] = {
             'month_names': month_names,
             'previous_units': previous_units,
@@ -113,7 +106,11 @@ def index():
             'reduced_units': reduced_units,
             'new_units': new_units,
             'new_cost': new_cost,
-            'enable_history': enable_history
+            'enable_history': enable_history,
+            'target_avg_cost': target_avg_cost if reduce_type == "money" else 0.0,
+            'target_avg_units': new_avg_units if reduce_type == "money" else 0.0,
+            'cost_at_target_units': new_cost if reduce_type == "money" else 0.0,
+            'actual_money_saved': actual_money_saved if reduce_type == "money" else 0.0
         }
 
         session['form_data'] = {
@@ -124,19 +121,14 @@ def index():
             'reduce_type': reduce_type,
             'reduce_units': reduce_units,
             'reduce_money': reduce_money,
-            'previous_units': previous_units[1:]  # ✅ ข้ามเดือนปัจจุบันตัวแรกไป
-
+            'previous_units': previous_units[1:]
         }
 
-        # ✅ ส่ง redirect ไปหน้า index (แต่ไม่ต้อง clear session ที่นี่)
         return redirect(url_for('Cal_electric_price.index'))
 
-    # ✅ ตอน GET
     if 'form_data' not in session:
-        # ถ้าไม่มีข้อมูลใน session เลย = เข้ามาครั้งแรก ➔ clear session
         session.clear()
 
-    # ดึงข้อมูลมาแสดง
     data = session.get('data', {
         'month_names': [],
         'previous_units': [],
@@ -149,7 +141,11 @@ def index():
         'reduced_units': 0,
         'new_units': 0,
         'new_cost': 0.0,
-        'enable_history': False
+        'enable_history': False,
+        'target_avg_cost': 0.0,
+        'target_avg_units': 0.0,
+        'cost_at_target_units': 0.0,
+        'actual_money_saved': 0.0
     })
     form_data = session.get('form_data', None)
 
