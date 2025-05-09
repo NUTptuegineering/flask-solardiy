@@ -8,13 +8,13 @@ function toggleHistoryInputs() {
     let checkbox = document.getElementById("enable_history");
     let historySection = document.getElementById("history_section");
 
-    if (checkbox.checked || checkbox.hasAttribute("checked")) { // ✅ ตรวจสอบว่ามีค่า checked หรือไม่
+    if (checkbox.checked || checkbox.hasAttribute("checked")) {
         historySection.style.display = "block";
     } else {
         historySection.style.display = "none";
         document.getElementById("month_inputs").innerHTML = "";
     }
-    updateMonthInputs(); // ✅ อัปเดตช่องย้อนหลัง
+    updateMonthInputs();
 }
 
 function updateMonthInputs() {
@@ -23,7 +23,7 @@ function updateMonthInputs() {
     const currentMonth = parseInt(document.getElementById("current_month").value);
     const monthCount = parseInt(document.getElementById("month_count").value);
 
-    inputContainer.innerHTML = ""; // ✅ ล้างค่าก่อนสร้างใหม่
+    inputContainer.innerHTML = "";
 
     if (!checkbox.checked) return;
 
@@ -52,8 +52,7 @@ function updateMonthInputs() {
             input.min = 0;
             input.required = checkbox.checked;
             input.className = "form-control";
-        
-            // ✅ ดึงค่าเก่าจาก previousUnits
+
             if (previousUnits.length >= i) {
                 input.value = previousUnits[i-1];
             }
@@ -63,9 +62,7 @@ function updateMonthInputs() {
             row.appendChild(inputCol);
             wrapper.appendChild(row);
             inputContainer.appendChild(wrapper);
-        }
-        
-        
+        }  
 }
 
 function showResetButton() {
@@ -73,43 +70,33 @@ function showResetButton() {
 }
 
 document.getElementById("electricityForm").addEventListener("submit", function (event) {
-    showResetButton();       // ✅ แสดงปุ่มรีเซ็ตข้อมูล
+    showResetButton();
 });
 
-
 function resetForm_cal() {
-    document.getElementById("electricityForm").reset(); // ✅ รีเซ็ตฟอร์ม
+    document.getElementById("electricityForm").reset();
 
-    // ✅ ล้างค่าผลลัพธ์ที่แสดง
     const results = document.getElementById("results");
     const reducedResults = document.getElementById("reduced_results");
     if (results) results.innerHTML = "";
     if (reducedResults) reducedResults.innerHTML = "";
 
-    // ✅ รีเซ็ตข้อมูลย้อนหลัง
     document.getElementById("month_inputs").innerHTML = "";
 
-    // ✅ รีเซ็ต checkbox การใช้ย้อนหลัง
     const historyCheckbox = document.getElementById("enable_history");
     historyCheckbox.checked = false;
     historyCheckbox.removeAttribute("checked");
 
-    // ✅ รีเซ็ต dropdown ลดค่าไฟ
     document.getElementById("reduce_type").value = "";
     toggleInputFields();
 
-    // ✅ ซ่อน input ลดค่าไฟ
     document.getElementById("unit_input").style.display = "none";
     document.getElementById("money_input").style.display = "none";
 
-    // ✅ อัปเดต UI ที่เกี่ยวข้อง
     toggleHistoryInputs();
 
-    // ✅ ซ่อนปุ่ม "รีเซ็ตข้อมูล" อีกครั้ง
     document.getElementById("resetFormButton").style.display = "none";
 }
-
-
 
 document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("enable_history").addEventListener("change", toggleHistoryInputs);
@@ -117,14 +104,12 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("current_month").addEventListener("change", updateMonthInputs);
     document.getElementById("reduce_type").addEventListener("change", toggleInputFields);
 
-    // ✅ รอให้ DOM เสถียรก่อนแล้วค่อย toggle
     setTimeout(() => {
         toggleHistoryInputs();
         updateMonthInputs();
         toggleInputFields();
     }, 10);
 
-    // ✅ แสดงปุ่มรีเซ็ตถ้ามีผลลัพธ์
     if ((document.getElementById("results") && document.getElementById("results").innerHTML.trim() !== "") ||
         (document.getElementById("reduced_results") && document.getElementById("reduced_results").innerHTML.trim() !== "")) {
         document.getElementById("resetFormButton").style.display = "block";
@@ -133,13 +118,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function resetForm() {
     if (confirm('คุณต้องการรีเซ็ตข้อมูลทั้งหมดหรือไม่?')) {
-        window.location.href = "/Cal_electric_price/reset";  // ✅ ตรงนี้พิมพ์ path ให้ตรงกับ server
+        window.location.href = "/Cal_electric_price/reset";
     }
 }
-
-
-
-
-
-
-

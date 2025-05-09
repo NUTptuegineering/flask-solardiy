@@ -47,7 +47,7 @@ async function generateLayout() {
             console.log("⚠️ มีคำเตือน: ", data.warning);
         
             const layoutWarning = document.getElementById("layout-warning");
-            layoutWarning.textContent = data.warning;
+            layoutWarning.textContent = data.warni;
             layoutWarning.style.display = "block";
         
             const offset = 150;
@@ -76,23 +76,12 @@ async function generateLayout() {
                     window.scrollTo({ top: topPos, behavior: 'smooth' });
                 }, 100);
             };
-        
-            // ✅ แนบ timestamp เพื่อหลอก browser ให้โหลดใหม่
+
             console.log("🔁 รีเซ็ต layoutImage.src แล้ว set ใหม่");
             const uniqueBase64 = `data:image/png;base64,${data.plot_url}?t=${Date.now()}`;
             layoutImage.src = uniqueBase64;
             layoutImage.style.display = 'block';
         }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
 
         const layoutImage = document.getElementById('layout-image');
         layoutImage.src = `data:image/png;base64,${data.plot_url}`;
@@ -100,19 +89,15 @@ async function generateLayout() {
         layoutImage.onload = () => {
             document.getElementById('layout-card').style.display = "block";
             document.getElementById('summary').style.display = "block";
-          
-            // ✅ ถ้าไม่มี warning ค่อย scroll ไป summary
+
             if (!data.warning) {
               document.getElementById('summary').scrollIntoView({ behavior: 'smooth' });
             }
           };          
-          
 
-        // 📋 ล้างตารางเก่า
         const summaryTableBody = document.getElementById('summary-table-body');
         summaryTableBody.innerHTML = '';
 
-        // 📋 ฟังก์ชันช่วยเพิ่มข้อมูล
         function addRow(label, value) {
             if (value > 0) {
                 const row = document.createElement('tr');
@@ -124,13 +109,11 @@ async function generateLayout() {
             }
         }
 
-        // 📋 เพิ่มข้อมูลแผง / ตัวต่อ / Clamp
         addRow('แผงโซลาร์เซลล์', data.total_panels);
         addRow('ตัวต่อราง (Rail Connectors)', data.rail_connector_count);
         addRow('End Clamp', data.end_clamp_count);
         addRow('Middle Clamp', data.middle_clamp_count);
 
-        // 📋 เพิ่มข้อมูลราง
         if (data.rail_summary && Object.keys(data.rail_summary).length) {
             Object.entries(data.rail_summary).forEach(([size, count]) => {
                 addRow(`รางขนาด ${size} เมตร`, count);
@@ -160,23 +143,6 @@ function resetForm() {
     document.getElementById("summary-table-body").innerHTML = `
         <tr><td colspan="2" class="text-muted">– ยังไม่มีข้อมูล –</td></tr>
     `;
-}
-
-
-function resetForm() {
-    console.log("🔄 รีเซ็ตฟอร์มแล้ว");
-
-    document.getElementById("roof-width").value = "";
-    document.getElementById("roof-length").value = "";
-    document.getElementById("panel-width").value = "";
-    document.getElementById("panel-length").value = "";
-    document.getElementById("num-panels").value = "";
-    document.getElementById("center-align").checked = false;
-
-    document.getElementById("error-message").textContent = "";
-    document.getElementById("layout-image").style.display = "none";
-    document.getElementById("layout-image").src = "";
-    document.getElementById("summary").innerHTML = "";
 }
 
 

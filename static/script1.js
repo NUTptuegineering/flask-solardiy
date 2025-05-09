@@ -37,8 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-
-
 document.addEventListener('DOMContentLoaded', function () {
     loadProvinces();
     initializeDeviceTable();
@@ -540,17 +538,13 @@ function loadDevicesForRow(rowNumber) {
                 dataList.appendChild(option);
             });
 
-            // ตรวจสอบว่า input มีอยู่ไหม
             const deviceInput = document.querySelector(`input[name="device${rowNumber}"]`);
             if (deviceInput) {
-                // ผูก datalist ใหม่ (เผื่อโดน reset)
                 deviceInput.setAttribute("list", `deviceList${rowNumber}`);
 
-                // ล้าง event listener เดิมด้วยการ clone
                 const newDeviceInput = deviceInput.cloneNode(true);
                 deviceInput.parentNode.replaceChild(newDeviceInput, deviceInput);
 
-                // ✅ เพิ่ม event listener ใหม่
                 newDeviceInput.addEventListener('input', function () {
                     const selectedDevice = devices.find(device => device.name === newDeviceInput.value);
                     const powerInput = document.querySelector(`input[name="power${rowNumber}"]`);
@@ -563,7 +557,6 @@ function loadDevicesForRow(rowNumber) {
         .catch(error => console.error('Error loading devices:', error));
 }
 
-
 function handleSystemTypeChange() {
     const selectedSystemType = document.querySelector('input[name="systemType"]:checked');
     const batterySystemDiv = document.getElementById('batterySystem');
@@ -572,8 +565,8 @@ function handleSystemTypeChange() {
     const backupDaysDiv = document.getElementById('backupdays');
     const loadSection = document.getElementById('loadSection');
     const onGridInputSection = document.getElementById('onGridInputSection');
+    const solarChargerContainer = document.getElementById('solarChargerContainer');
 
-    // ✅ เคลียร์ข้อมูล Inverter + Panel + Battery ทุกครั้งที่สลับ
     const containersToClear = ["batteryDetails", "panelSystem", "inverterContainer", "inverterContainerOffGrid"];
     containersToClear.forEach(id => {
         const el = document.getElementById(id);
@@ -583,7 +576,6 @@ function handleSystemTypeChange() {
         }
     });
 
-    // ✅ ซ่อนราคาและข้อความแนะนำ
     const summary = document.getElementById("priceSummary");
     const solarText = document.getElementById("solarInstallationDisplay");
     if (summary) {
@@ -594,7 +586,6 @@ function handleSystemTypeChange() {
         solarText.textContent = "";
     }
 
-    // ✅ แสดง UI ตามประเภท
     if (selectedSystemType && selectedSystemType.id === 'offGrid') {
         batterySystemDiv.classList.remove('d-none');
         backupDaysDiv.classList.remove('d-none');
@@ -607,6 +598,10 @@ function handleSystemTypeChange() {
         batteryDetails.innerHTML = '';
         loadSection.classList.add('d-none');
         onGridInputSection.classList.remove('d-none');
+    }
+    if (solarChargerContainer) {
+        solarChargerContainer.classList.add("d-none");
+        solarChargerContainer.innerHTML = "";
     }
 }
 
@@ -641,15 +636,14 @@ async function handleOnGridCalculation() {
     const panelContainer = document.getElementById('panelSystem');
     const priceSummary = document.getElementById('priceSummary');
     const loadSection = document.getElementById("loadSection");
-    if (loadSection) loadSection.classList.add("d-none"); // ✅ บังคับซ่อนไว้ทุกครั้ง
+    if (loadSection) loadSection.classList.add("d-none");
 
     if (!reductionInput || !outputDiv || !province) return;
 
     const desiredReduction = parseFloat(reductionInput.value);
     const sunHours = parseFloat(document.getElementById("sunHoursInput")?.value) || 4;
-    //const bufferFactor = 1.2;
     
-    const dailyReduction = desiredReduction / 30;  // ✅ หาร 30 ก่อน
+    const dailyReduction = desiredReduction / 30;
     const requiredKw = (dailyReduction / sunHours).toFixed(2);
     
 
@@ -662,7 +656,6 @@ async function handleOnGridCalculation() {
     const inverterContainer = document.getElementById("inverterContainer");
     inverterContainer.innerHTML = '';
 
-    // ✅ ใช้ค่า kWp ที่ได้จาก panel เพื่อกรอง inverter
     const requiredSolarPowerKWp = await loadSolarPanelOptions(panelContainer, estimatedDailyEnergy, true);
     if (requiredSolarPowerKWp) {
         await loadInverterOnGridOptions(inverterContainer, parseFloat(requiredSolarPowerKWp));
@@ -671,14 +664,13 @@ async function handleOnGridCalculation() {
     calculateTotalPrice();
 }
 
-// ฟังก์ชันเริ่มต้นโหลดข้อมูลอุปกรณ์ในแถวที่มีอยู่
 function initializeDeviceTable() {
     const rows = document.querySelectorAll('#deviceTable tr');
-    rowCounter = rows.length - 1; // ลบ 1 เพื่อไม่นับแถวหัวตาราง
+    rowCounter = rows.length - 1;
 
     for (let i = 1; i <= rowCounter; i++) {
-        loadDevicesForRow(i); // โหลดข้อมูลอุปกรณ์สำหรับแต่ละแถว
-        addCalculationListener(i); // เพิ่ม event listener สำหรับการคำนวณ Wh/วัน
+        loadDevicesForRow(i);
+        addCalculationListener(i);
     }
 }
 
@@ -718,25 +710,21 @@ function addDeviceRow() {
 
 
 function resetRow(button) {
-    const row = button.closest('tr'); // ค้นหาแถวที่ปุ่มอยู่
+    const row = button.closest('tr');
     if (row) {
-        // รีเซ็ตค่าใน input
         row.querySelector('input[name^="device"]').value = '';
         row.querySelector('input[name^="power"]').value = '';
         row.querySelector('input[name^="quantity"]').value = '';
         row.querySelector('input[name^="hours"]').value = '';
         row.querySelector('input[name^="watt"]').value = '';
 
-        // ดึงหมายเลขแถวจากชื่อ input (เช่น device1 -> 1)
         const rowNumber = row.querySelector('input[name^="device"]').getAttribute('name').match(/\d+$/)[0];
 
-        // โหลดข้อมูลอุปกรณ์ใหม่และรีผูก event listener
         loadDevicesForRow(rowNumber);
         addCalculationListener(rowNumber);
     }
 }
 
-// ฟังก์ชันลบแถวและปรับลำดับ
 function deleteRow(button) {
     const row = button.closest('tr'); // ค้นหาแถวที่ปุ่มอยู่
     row.remove(); // ลบแถวออกจาก DOM
@@ -764,15 +752,12 @@ function deleteRow(button) {
             if (datalist) {
                 datalist.setAttribute('id', `deviceList${rowNumber}`);
             }
-
-            // รีโหลดข้อมูลอุปกรณ์และรีผูก event listener ใหม่
             loadDevicesForRow(rowNumber);
             addCalculationListener(rowNumber);
         }
     });
 }
 
-// ฟังก์ชันเพิ่ม event listener เพื่อคำนวณ Wh/วัน
 function addCalculationListener(rowNumber) {
     const quantityInput = document.querySelector(`input[name="quantity${rowNumber}"]`);
     const hoursInput = document.querySelector(`input[name="hours${rowNumber}"]`);
@@ -786,7 +771,6 @@ function addCalculationListener(rowNumber) {
     });
 }
 
-// ฟังก์ชันคำนวณ Wh/วัน
 function calculateWattPerDay(rowNumber) {
     const power = parseFloat(document.querySelector(`input[name="power${rowNumber}"]`).value) || 0;
     const quantity = parseFloat(document.querySelector(`input[name="quantity${rowNumber}"]`).value) || 0;
@@ -795,11 +779,9 @@ function calculateWattPerDay(rowNumber) {
     const wattPerDay = power * quantity * hours;
     document.querySelector(`input[name="watt${rowNumber}"]`).value = wattPerDay.toFixed(2); // แสดงผลด้วยทศนิยม 2 ตำแหน่ง
 
-    // อัปเดตพลังงานรวมทั้งหมด
     updateTotalEnergyDisplay();
 }
 
-// ฟังก์ชันคำนวณพลังงานรวมทั้งหมด
 function calculateTotalEnergyPerDay() {
     let totalEnergy = 0;
 
@@ -810,16 +792,15 @@ function calculateTotalEnergyPerDay() {
         }
     }
 
-    return totalEnergy.toFixed(2); // คืนค่าทศนิยม 2 ตำแหน่ง
+    return totalEnergy.toFixed(2);
 }
 
-// ฟังก์ชันอัปเดตพลังงานรวมทั้งหมดในหน้าเว็บ
 function updateTotalEnergyDisplay() {
     const rows = document.querySelectorAll('#deviceTable tr');
     let totalEnergy = 0;
 
     rows.forEach((row, index) => {
-        if (index > 0) { // ข้ามหัวตาราง
+        if (index > 0) {
             const wattInput = row.querySelector(`input[name^="watt"]`);
             if (wattInput) {
                 totalEnergy += parseFloat(wattInput.value) || 0;
@@ -831,7 +812,6 @@ function updateTotalEnergyDisplay() {
     totalEnergyDisplay.textContent = `พลังงานรวมทั้งหมดต่อวัน: ${totalEnergy.toFixed(2)} Wh`;
 }
 
-// เรียกฟังก์ชันนี้ทุกครั้งที่เปลี่ยนประเภท
 document.querySelectorAll('input[name="systemType"]').forEach(radio => {
     radio.addEventListener('change', handleSystemTypeChange);
 });
@@ -852,11 +832,9 @@ function handleBatterySelection() {
     const selectedBattery = document.querySelector('input[name="batterySystem"]:checked');
     const batteryContainer = document.getElementById('batteryDetails');
     if (!selectedBattery) {
-        // ซ่อนตารางหากไม่ได้เลือกแบตเตอรี่
         batteryContainer.classList.add('d-none');
         batteryContainer.innerHTML = '';
     }
-    // ไม่แสดงผลใดๆ ที่นี่ ให้ทำเฉพาะใน drawRectangle()
 }
 
 function resetForm() {
@@ -864,10 +842,9 @@ function resetForm() {
     const confirmReset = confirm("คุณต้องการล้างข้อมูลทั้งหมดหรือไม่?");
     if (!confirmReset) {
         console.log("Reset cancelled by user");
-        return; // ยกเลิกการถ้าผู้ใช้กด "ยกเลิก"
+        return;
     }
 
-    // รีเซ็ตฟอร์ม
     const form = document.getElementById('rectangleForm');
     if (form) {
         form.reset();
@@ -876,28 +853,36 @@ function resetForm() {
         console.error("Form not found.");
     }
 
-    // ซ่อนข้อมูลแบตเตอรี่และแผงโซลาร์เซลล์
     const batterySystemDiv = document.getElementById('batterySystem');
     const batteryDetails = document.getElementById('batteryDetails');
-    const panelSystemDiv = document.getElementById('panelSystem'); // ✅ เพิ่มตัวแปรตารางแผงโซลาร์
+    const panelSystemDiv = document.getElementById('panelSystem');
     const priceSummary = document.getElementById('priceSummary');
     const totalEnergyDisplay = document.getElementById('totalEnergyDisplay');
-    const solarInstallationDisplay = document.getElementById('solarInstallationDisplay'); // ✅ เพิ่มตัวแปรแสดงกำลังติดตั้งโซลาร์
+    const solarInstallationDisplay = document.getElementById('solarInstallationDisplay');
+    const chargerContainer = document.getElementById('solarChargerContainer');
 
     if (batterySystemDiv) batterySystemDiv.classList.add('d-none');
     if (batteryDetails) {
         batteryDetails.classList.add('d-none');
         batteryDetails.innerHTML = '';
     }
-    if (panelSystemDiv) { // ✅ ซ่อนตารางแผงโซลาร์
+    if (panelSystemDiv) {
         panelSystemDiv.classList.add('d-none');
         panelSystemDiv.innerHTML = '';
     }
-    if (priceSummary) priceSummary.textContent = "ประมาณราคา = ";
+    if (priceSummary) {
+        priceSummary.textContent = "ประมาณราคา = ";
+        priceSummary.classList.add("d-none");
+    }
+    
     if (totalEnergyDisplay) totalEnergyDisplay.textContent = "พลังงานรวมทั้งหมดต่อวัน: 0.00 Wh";
-    if (solarInstallationDisplay) solarInstallationDisplay.textContent = ""; // ✅ ซ่อนข้อความกำลังติดตั้งแผงโซลาร์
+    if (solarInstallationDisplay) 
+        solarInstallationDisplay.textContent = "";
 
-    // ✅ เคลียร์ตาราง inverter ทั้ง On-Grid และ Off-Grid
+    if (chargerContainer) {
+        chargerContainer.classList.add('d-none');
+        chargerContainer.innerHTML = '';
+    }
     const inverterContainers = ["inverterContainer", "inverterContainerOffGrid"];
     inverterContainers.forEach(id => {
         const el = document.getElementById(id);
@@ -907,33 +892,36 @@ function resetForm() {
         }
     });
 
-    // ลบแถวในตารางอุปกรณ์ ยกเว้นหัวตาราง
     const deviceTable = document.getElementById('deviceTable');
     if (deviceTable) {
         const rows = deviceTable.querySelectorAll('tr');
         rows.forEach((row, index) => {
-            if (index > 0) row.remove(); // ลบแถวที่ไม่ใช่หัวตาราง
+            if (index > 0) row.remove();
         });
 
-        // เพิ่มแถวเริ่มต้นใหม่
         const initialRow = `
             <tr>
                 <td>1</td>
                 <td>
-                    <input list="deviceList1" name="device1" placeholder="ชื่ออุปกรณ์">
-                    <datalist id="deviceList1"></datalist>
-                    <button type="button" class="reset-button" onclick="resetRow(this)">
-                        <img src="/static/refresh-icon.jpg" alt="Reset">
-                    </button>
+                    <div class="d-flex align-items-center gap-2">
+                        <input list="deviceList1" name="device1" placeholder="ชื่ออุปกรณ์" class="form-control form-control-sm">
+                        <datalist id="deviceList1"></datalist>
+                        <button type="button" class="reset-button" onclick="resetRow(this)">
+                        <i class="bi bi-arrow-repeat fs-5 text-secondary"></i>
+                        </button>
+                    </div>
                 </td>
-                <td><input type="text" name="power1" placeholder="W"></td>
-                <td><input type="text" name="quantity1" placeholder="จำนวน"></td>
-                <td><input type="text" name="hours1" placeholder="ชม./วัน"></td>
-                <td><input type="text" name="watt1" placeholder="Wh/วัน" readonly></td>
+
+                    <td><input type="text" name="power1" placeholder="W" class="form-control form-control-sm text-center"></td>
+                    <td><input type="text" name="quantity1" placeholder="จำนวน" class="form-control form-control-sm text-center"></td>
+                    <td><input type="text" name="hours1" placeholder="ชม./วัน" class="form-control form-control-sm text-center"></td>
+                    <td><input type="text" name="watt1" placeholder="Wh/วัน" class="form-control form-control-sm text-center" readonly></td>
+
                 <td>
                     <button type="button" class="delete-button" onclick="deleteRow(this)">
-                        <img src="/static/delete-icon.png" alt="Delete">
+                        <i class="bi bi-trash3 fs-5 text-danger"></i>
                     </button>
+
                 </td>
             </tr>
         `;
@@ -952,9 +940,9 @@ panelSystemDiv.innerHTML = '<label>เลือกระบบแผงโซล
 async function fetchAndSanitizeJSON(url) {
     try {
         const response = await fetch(url);
-        const text = await response.text(); // รับข้อมูลเป็นข้อความ
-        const sanitizedText = text.replace(/NaN/g, "null"); // แทนที่ NaN ด้วย null
-        const data = JSON.parse(sanitizedText); // แปลงข้อความ JSON เป็น Object
+        const text = await response.text();
+        const sanitizedText = text.replace(/NaN/g, "null");
+        const data = JSON.parse(sanitizedText);
         return data;
     } catch (error) {
         console.error("Error fetching or sanitizing JSON:", error);
@@ -966,10 +954,10 @@ async function getPvoutForProvince(province) {
     try {
         const response = await fetch('/static/provinces_pvout.json');
         const data = await response.json();
-        return data[province]?.pvout || 120; // fallback เป็น 120 ถ้าไม่พบ
+        return data[province]?.pvout || 120;
     } catch (error) {
         console.error("ไม่สามารถโหลด pvout ได้:", error);
-        return 120; // fallback
+        return 120;
     }
 }
 
@@ -979,8 +967,6 @@ function showLoadSection() {
       section.classList.remove('d-none');
     }
   }
-
-
 
 async function loadInverterOffGridOptions(container, requiredKw = 0, batteryVoltage = null) {
     const selectedPhase = document.querySelector('input[name="phaseType"]:checked')?.value || "1";
@@ -999,21 +985,18 @@ async function loadInverterOffGridOptions(container, requiredKw = 0, batteryVolt
             let inverters = result.data;
             console.log("📥 ได้ข้อมูล inverter ทั้งหมด:", inverters.length);
 
-            // ✅ กรอง Rated Power
             inverters = inverters.filter(inv => {
                 const rated = parseFloat(inv["Rated Power(kW)"]);
                 return !isNaN(rated) && rated >= requiredKw;
             });
             console.log("🔍 หลังกรองกำลังไฟ >= requiredKw:", inverters.length);
 
-            // ✅ กรองตาม Phase ที่ผู้ใช้เลือก (1 หรือ 3)
             inverters = inverters.filter(inv => {
                 const invPhase = inv.Phase?.toString().trim();
                 return invPhase === selectedPhase;
             });
             console.log(`🎛️ หลังกรองด้วยเฟส ${selectedPhase}: เหลือ`, inverters.length, "ตัว");
 
-            // ✅ กรองตาม Battery Voltage (ถ้ามี)
             if (batteryVoltage !== null) {
                 inverters = inverters.filter(inv => {
                     const rawVoltages = inv["Voltage_battery"];
@@ -1038,7 +1021,6 @@ async function loadInverterOffGridOptions(container, requiredKw = 0, batteryVolt
                 return;
             }
 
-            // ✅ สร้างตาราง HTML แสดง Inverter
             let tableHTML = `
                 <h5 class="fw-bold text-success mb-3">🔌 เลือก Inverter สำหรับระบบ Off-Grid</h5>
                 <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
@@ -1106,7 +1088,6 @@ async function loadInverterOnGridOptions(container, requiredKw = 0) {
             let inverters = result.data;
             console.log("🎯 ได้ inverter ทั้งหมด:", inverters.length);
 
-            // ✅ กรองทั้ง Rated Power และ Phase
             const filteredInverters = inverters.filter(inv => {
                 const rated = parseFloat(inv["Rated Power(kW)"]);
                 const phase = inv.Phase?.toString().trim();
@@ -1120,7 +1101,6 @@ async function loadInverterOnGridOptions(container, requiredKw = 0) {
                 return;
             }
 
-            // ✅ สร้างตารางแสดงผล
             let tableHTML = `
             <h5 class="fw-bold text-success mb-3">⚡ เลือก Inverter สำหรับระบบ On-Grid</h5>
             <div class="table-responsive" style="max-height: 300px; overflow-y: auto; overflow-x: auto;">
@@ -1140,9 +1120,6 @@ async function loadInverterOnGridOptions(container, requiredKw = 0) {
                 </thead>
                 <tbody>`;
         
-        
-        
-
             filteredInverters.forEach((inv, index) => {
                 tableHTML += `
                     <tr>
@@ -1171,7 +1148,6 @@ async function loadInverterOnGridOptions(container, requiredKw = 0) {
         container.innerHTML = "<p>เกิดข้อผิดพลาดในการโหลด Inverter</p>";
     }
 }
-
 
 async function loadSolarPanelOptions(panelContainer, totalEnergy, isOnGrid = false) {
     try {
@@ -1253,9 +1229,7 @@ async function loadSolarPanelOptions(panelContainer, totalEnergy, isOnGrid = fal
                         </tbody>
                     </table>
                 </div>
-            `;
-            
-            
+            `;       
             }
 
             panelContainer.classList.remove('d-none');
@@ -1272,7 +1246,6 @@ async function loadSolarPanelOptions(panelContainer, totalEnergy, isOnGrid = fal
         return null;
     }
 }
-
 
 function calculateTotalPrice() {
     let totalBatteryPrice = 0;
@@ -1308,7 +1281,6 @@ function calculateTotalPrice() {
     priceSummary.style.display = "block";
 
     if (systemType === "offGrid") {
-        // 👉 เงื่อนไขเฉพาะกรณี Off-Grid
         let chargerLine = "";
         let hrLine = "";
 
@@ -1327,7 +1299,6 @@ function calculateTotalPrice() {
             💰 <strong>รวมทั้งหมด:</strong> ${totalPrice.toLocaleString()} THB
         `;
     } else if (systemType === "onGrid") {
-        // 👉 แสดงเฉพาะแผง + อินเวอร์เตอร์
         const totalPriceOnGrid = totalPanelPrice + totalInverterPrice;
         priceSummary.innerHTML = `
             <strong>ประมาณราคา:</strong><br>
@@ -1339,11 +1310,9 @@ function calculateTotalPrice() {
     }
 }
 
-
-
 document.addEventListener("change", function (event) {
     if (event.target.name === "batterySelect" || event.target.name === "panelSelect") {
-        calculateTotalPrice(); // ✅ คำนวณราคารวมใหม่ทุกครั้งที่ผู้ใช้เลือก
+        calculateTotalPrice();
     }
 });
 
@@ -1353,12 +1322,10 @@ document.addEventListener("change", function (event) {
     }
 });
 
-
 document.addEventListener("change", async function (event) {
     if (event.target.name === "batterySelect") {
         const voltage = parseFloat(document.querySelector('input[name="batterySystem"]:checked')?.value || "0");
         if (!isNaN(voltage) && (voltage === 12 || voltage === 24)) {
-            // ดึงข้อมูลล่าสุดของแบตเตอรี่อีกครั้ง
             const selectedBackupDays = parseInt(document.querySelector('input[name="backupdays"]:checked')?.value || "1");
             const totalEnergyPerDay = parseFloat(calculateTotalEnergyPerDay());
             const totalEnergyForBattery = totalEnergyPerDay * selectedBackupDays;
@@ -1369,9 +1336,8 @@ document.addEventListener("change", async function (event) {
             if (batteryResult.status === 'success') {
                 const filteredData = batteryResult.data.filter(battery =>
                     parseFloat(battery["Voltage (V)"]) === voltage);
-                await handleChargerDisplay(filteredData, voltage); // ✅ เรียกแสดงผล Charger
+                await handleChargerDisplay(filteredData, voltage);
             }
         }
     }
 });
-

@@ -9,13 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let provinceGenMap = {};
 
-  // โหลด province_gen.json
   fetch('/static/provinces_pvout.json')
     .then(response => response.json())
     .then(data => {
       provinceGenMap = data;
 
-      // เติม dropdown จังหวัด
       for (const province in data) {
         const option = document.createElement('option');
         option.value = province;
@@ -24,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-  // toggle การแสดงผลตาม genOption
   genOption.addEventListener('change', () => {
     const selected = genOption.value;
     if (selected === 'province') {
@@ -43,7 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // อัปเดตค่า gen เมื่อเลือกจังหวัด
   provinceSelect.addEventListener('change', () => {
     const selected = provinceSelect.value;
     if (provinceGenMap[selected]) {
@@ -53,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // อัปเดตค่า gen เมื่อกรอก PSH
   pshInput.addEventListener('input', () => {
     const psh = parseFloat(pshInput.value);
     if (!isNaN(psh)) {
@@ -61,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ⏱️ ก่อน submit: คำนวณและแสดงสูตรใน console
   form.addEventListener('submit', () => {
     let gen = 1400;
 
