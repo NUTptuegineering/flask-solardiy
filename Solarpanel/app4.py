@@ -1,4 +1,3 @@
-print("✅ Loaded app4.py!")
 import matplotlib
 matplotlib.use('Agg')
 
@@ -71,7 +70,6 @@ def generate_plot(roof_width, roof_length, num_panels_requested, center_align, p
     layout_ax.text(roof_length / 2, -offset, f"Length: {roof_length}m", ha='center', fontsize=font_size, color='black')
     layout_ax.text(-offset, roof_width / 2, f"Width: {roof_width}m", va='center', rotation=90, fontsize=font_size, color='black')
 
-    # เตรียมตัวแปร
     rails_used = []
     connector_positions = []
     end_clamp_positions = []
@@ -89,10 +87,9 @@ def generate_plot(roof_width, roof_length, num_panels_requested, center_align, p
         panel_y_bottom = start_y + i * (panel_width + row_spacing) + rail_offset
 
         required_rail_length = panels_in_this_row * (panel_length + spacing) - spacing
-        rail_combination = list(select_rail_combination(required_rail_length, rail_sizes))  # ⭐⭐⭐ ตรงนี้แปลงเป็น list ไปเลย
+        rail_combination = list(select_rail_combination(required_rail_length, rail_sizes))
         rails_used.append(rail_combination)
 
-        # จุดวางราง
         rail_start_x = start_x + (required_rail_length - sum(rail_combination)) / 2
         current_x = rail_start_x
         for rail_length in rail_combination:
@@ -101,7 +98,6 @@ def generate_plot(roof_width, roof_length, num_panels_requested, center_align, p
             layout_ax.plot([current_x, current_x + rail_length], [panel_y_bottom, panel_y_bottom], color=color, lw=2)
             current_x += rail_length
 
-        # จุด connector ถ้ามีต่อราง
         if len(rail_combination) > 1:
             connector_positions += [
                 (rail_start_x + sum(rail_combination[:k]), panel_y_top)
@@ -112,7 +108,6 @@ def generate_plot(roof_width, roof_length, num_panels_requested, center_align, p
             ]
             rail_connectors += 2 * (len(rail_combination) - 1)
 
-        # จุดแผง และ clamp
         for j in range(panels_in_this_row):
             panel_x = start_x + j * (panel_length + spacing)
             panel_y = start_y + i * (panel_width + row_spacing)
@@ -124,7 +119,6 @@ def generate_plot(roof_width, roof_length, num_panels_requested, center_align, p
                 middle_clamp_positions.append((middle_x, panel_y_bottom))
                 middle_clamp_count += 2
 
-        # End clamp
         first_panel_x = start_x
         last_panel_x = start_x + (panels_in_this_row - 1) * (panel_length + spacing)
         end_clamp_positions.extend([
@@ -134,7 +128,6 @@ def generate_plot(roof_width, roof_length, num_panels_requested, center_align, p
             (last_panel_x + panel_length, panel_y_bottom)
         ])
 
-    # ตำแหน่ง Marker
     for x, y in middle_clamp_positions:
         layout_ax.scatter(x, y, color='black', s=50)
     for x, y in connector_positions:
@@ -142,7 +135,6 @@ def generate_plot(roof_width, roof_length, num_panels_requested, center_align, p
     for x, y in end_clamp_positions:
         layout_ax.scatter(x, y, color='blue', s=50)
 
-    # Legend
     legend_items = [
         Line2D([], [], marker='o', linestyle='None', color='black', markersize=8, label="Middle Clamp"),
         Line2D([], [], marker='o', linestyle='None', color='red', markersize=8, label="Rail Connector"),
@@ -171,39 +163,6 @@ def generate_plot(roof_width, roof_length, num_panels_requested, center_align, p
 
     return img_data, total_panels, rails_used, rail_summary, rail_connectors, len(end_clamp_positions), middle_clamp_count, warning_message
 
-# ช่วย function ย่อย
-def select_rail_combination(required_length, rail_sizes):
-    rail_sizes = sorted(rail_sizes)
-    for num_rails in range(1, len(rail_sizes) + 1):
-        for combo in combinations_with_replacement(rail_sizes, num_rails):
-            if sum(combo) >= required_length:
-                return combo
-    return [rail_sizes[0]] * (required_length // rail_sizes[0] + 1)
-
-def summarize_rails(rails_used):
-    summary = {}
-    for comb in rails_used:
-        for rail in comb:
-            summary[rail] = summary.get(rail, 0) + 2  # x2 เพราะวางรางคู่
-    return summary
-
-
-def select_rail_combination(required_length, rail_sizes):
-    rail_sizes = sorted(rail_sizes)
-    for num_rails in range(1, len(rail_sizes) + 1):
-        for combination in combinations_with_replacement(rail_sizes, num_rails):
-            if sum(combination) >= required_length:
-                return combination
-    return [rail_sizes[0]] * ((required_length + rail_sizes[0] - 1) // rail_sizes[0])
-
-
-def summarize_rails(rails_used):
-    rail_count = {}
-    for combination in rails_used:
-        for rail in combination:
-            rail_count[rail] = rail_count.get(rail, 0) + 2  # 2 เส้นต่อแถว
-    return rail_count
-
 def select_rail_combination(required_length, rail_sizes):
     rail_sizes = sorted(rail_sizes)
     for num_rails in range(1, len(rail_sizes) + 1):
@@ -227,9 +186,7 @@ def home():
 
 @program4_bp.route("/generate", methods=["POST"])
 def generate():
-    #assert False, "⚠️ This generate() was actually called!"
     print("🚀 Flask รับ request แล้วจ้า!", flush=True)
-    #raise Exception("💥 Boom! Just to prove this is the right route!")
     try:
         data = request.get_json()
         print("📥 JSON ที่ Flask ได้รับ:", data)
@@ -239,8 +196,6 @@ def generate():
         center_align = data.get("centerAlign", False)
         panel_width = float(data["panelLength"])
         panel_length = float(data["panelWidth"])
-
-
 
         if not float(num_panels_requested).is_integer():
             return jsonify({"error": "กรุณาใส่จำนวนแผงเป็นจำนวนเต็มเท่านั้นจ้ะ"}), 400
@@ -270,9 +225,8 @@ def generate():
             "rail_connector_count": rail_connectors,
             "end_clamp_count": end_clamps,
             "middle_clamp_count": middle_clamp_count,
-            "warning": warning_message  # ✅ เพิ่มตรงนี้
+            "warning": warning_message
         })
-
 
     except KeyError as ke:
         print("❌ ข้อมูลไม่ครบ:", str(ke))
