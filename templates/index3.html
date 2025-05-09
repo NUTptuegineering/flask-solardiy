@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <style>
       .btn-choose {
-        background: linear-gradient(to right, #89b6da, #c7d6e2); /* เปลี่ยนจากฟ้าสด */
+        background: linear-gradient(to right, #89b6da, #c7d6e2);
         color: #003366;
         font-weight: 600;
         border: none;
@@ -27,9 +27,8 @@
         text-decoration: none;
       }
 
-
       .btn-back-home {
-        background: linear-gradient(to right, #89b6da, #c7d6e2); /* เปลี่ยนจากฟ้าสด */
+        background: linear-gradient(to right, #89b6da, #c7d6e2);
         color: #003366;
         font-weight: 600;
         border: none;
@@ -49,10 +48,10 @@
       }
       .solar-heading {
         text-align: center;
-        font-size: 2rem; /* 🔵 ปรับจาก 2.5rem -> 2rem */
+        font-size: 2rem;
         font-weight: 700;
         margin-bottom: 1.5rem;
-        color: #0d6efd; /* Bootstrap Blue */
+        color: #0d6efd;
         background: none;
         position: relative;
         line-height: 1.2;
@@ -73,7 +72,6 @@
     </div>
   </div>
 
-    <!-- 🔸 Card หลัก -->
     <div class="card shadow-lg rounded-4 p-4 mx-auto" style="max-width: 960px;">
       <h2 class="solar-heading">🔥 คำนวณ ROI ระยะคืนทุนการติดตั้ง Solar Rooftop</h2>
 
@@ -84,7 +82,6 @@
         <label class="form-label mt-3">ขนาดระบบ (kWp)</label>
         <input type="number" name="size" class="form-control" step="any" value="{{ size or '' }}" required>
 
-        <!-- 🔸 วิธีเลือกพลังงาน -->
         <label class="form-label mt-3">เลือกวิธีระบุพลังงานเฉลี่ย</label>
         <select id="genOption" class="form-select" required>
           <option value="default" selected>ใช้ค่ามาตรฐานประเทศไทย (1400)</option>
@@ -92,7 +89,6 @@
           <option value="psh">กรอกเป็น Peak Sun Hour (ชั่วโมง/วัน)</option>
         </select>
 
-        <!-- 🔸 เลือกจังหวัด -->
         <div id="provinceSection" class="mt-3" style="display: none;">
           <label class="form-label">เลือกจังหวัด</label>
           <select id="provinceSelect" class="form-select">
@@ -100,13 +96,11 @@
           </select>
         </div>
 
-        <!-- 🔸 กรอก PSH -->
         <div id="pshSection" class="mt-3" style="display: none;">
           <label class="form-label">Peak Sun Hour เฉลี่ยต่อวัน (ชั่วโมง/วัน)</label>
           <input type="number" id="pshInput" step="any" class="form-control" placeholder="เช่น 4.5">
         </div>
 
-        <!-- 🔸 ช่องซ่อน สำหรับส่งค่า PVOUT -->
         <input type="hidden" name="gen" id="genInput" value="{{ gen or 1400 }}">
 
         <label class="form-label mt-3">ค่าไฟฟ้าเฉลี่ย (บาท/kWh)</label>
@@ -115,7 +109,6 @@
         <label class="form-label mt-3">อายุระบบ (ปี)</label>
         <input type="number" name="lifetime" value="{{ lifetime or 20 }}" class="form-control" required>
 
-        <!-- 🔘 ปุ่มคำนวณ + รีเซ็ต -->
         <div class="d-flex justify-content-center gap-2 mt-4">
           <button type="submit" class="btn btn-success">คำนวณ</button>
           <button type="button" class="btn btn-outline-danger" onclick="resetForm()">รีเซ็ต</button>
@@ -134,7 +127,6 @@
         📊 ROI ตลอดอายุระบบ: {{ result['roi'] }}%
       </div>
       
-
       <script>
         console.log("📊 ขั้นตอนการคำนวณ ROI Solar Rooftop");
         console.log("1. พลังงานผลิตต่อปี = {{ result['size'] }} × {{ gen }} = {{ result['gen_per_year'] }} kWh");
@@ -152,13 +144,11 @@
     function resetForm() {
       const form = document.getElementById("roiForm");
 
-      // เคลียร์ช่องกรอกข้อมูล
       form.querySelector('[name="cost"]').value = '';
       form.querySelector('[name="size"]').value = '';
       form.querySelector('[name="rate"]').value = '4.5';
       form.querySelector('[name="lifetime"]').value = '20';
 
-      // เคลียร์ dropdown และค่า PVOUT
       document.getElementById('genOption').value = 'default';
       document.getElementById('provinceSection').style.display = 'none';
       document.getElementById('pshSection').style.display = 'none';
@@ -166,7 +156,6 @@
       document.getElementById('pshInput').value = '';
       document.getElementById('genInput').value = '1400';
 
-      // 🔻 ซ่อนกล่องผลลัพธ์
       const resultBox = document.getElementById('resultBox');
       if (resultBox) {
         resultBox.style.display = 'none';
@@ -177,7 +166,5 @@
     }
 
     </script>
-    
-
 </body>
 </html>
